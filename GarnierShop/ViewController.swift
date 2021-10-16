@@ -18,6 +18,7 @@ struct jsonstruct: Codable {
     let price: String
     let categories: [Categories]
     let images: [Images]
+    //let attributes: [Atts]
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -27,6 +28,23 @@ struct jsonstruct: Codable {
         case price
         case categories
         case images
+        //case attributes
+    }
+}
+
+struct json: Codable {
+    let name: String
+    let price: String
+    let categories: [Categories]
+    let images: [Images]
+    let attributes: [Atts]
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case price
+        case categories
+        case images
+        case attributes
     }
 }
 
@@ -42,6 +60,10 @@ struct Images: Codable {
     let src: String
 }
 
+struct Atts: Codable {
+    let options: [String]
+}
+
 class ViewController: UIViewController, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource  {
     
     @IBOutlet weak var cartview: UIView!
@@ -51,14 +73,14 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDelegate
     @IBOutlet var cellView: UIView!
     @IBOutlet var headingLbl: UILabel!
     
-     
+    var attdata = [Atts]()
+    //var optiondata = [Options]()
     var imgdata = [Images]()
     var categorydata = [Categories]()
     var arrdata = [jsonstruct]()
-    
+    var jsondata = [json]()
     var detailInfo: jsonstruct?
     var cartArray = [CartStruct]()
-    
     var filterData = [jsonstruct]()
     
     var searching = false
@@ -127,9 +149,9 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDelegate
         //tableView.clipsToBounds = true
 
         getdata()
+        getdata2()
         tableView.reloadData()
         setUpSearchBar()
-        
         hideKeyboard()
         
         let color1 = hexStringToUIColor(hex: "#2C2C2E")
@@ -183,7 +205,6 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDelegate
     }
     
     func getdata() {
-        
         let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/products?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
         URLSession.shared.dataTask(with: url!) { (data, response, error) in
             do{if error == nil{
@@ -194,14 +215,31 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDelegate
                          self.tableView.reloadData()
                     }
                 }
-            
             }catch{
                 print("Error in get json data")
             }
-            
         }.resume()
         tableView.reloadData()
     }
+    
+    
+    func getdata2() {
+        let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/products?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
+        URLSession.shared.dataTask(with: url!) { (data, response, error) in
+            do{if error == nil{
+                self.jsondata = try JSONDecoder().decode([json].self, from: data!)
+
+                    print(self.jsondata)
+                    //DispatchQueue.main.async {
+                         //self.tableView.reloadData()
+                    //}
+                }
+            }catch{
+                print("Error in get json data json")
+            }
+        }.resume()
+    }
+    
     
     private func setUpSearchBar() {
         searchbar.delegate = self

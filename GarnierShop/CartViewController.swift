@@ -36,15 +36,15 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let count = cartArray.count
         totalCount.text = "(\(count) item(s))"
         
-        displayTotal()
+        //displayTotal()
     }
     
-    func displayTotal() {
-        let pricing1 = Double(subtotalPrice.text!)
+    /*func displayTotal() {
+        let pricing1 = Double(total_price)
         let pricing2 = Double(shippingPrice.text!)
-        let pricing = Double(pricing1! + pricing2!)
+        let pricing = Double(pricing1 + pricing2!)
         totalPrice.text = "$\(pricing)"
-    }
+    }*/
     
     func getCartData() {
            let defaults = UserDefaults.standard
@@ -71,11 +71,18 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     
     func showActionsheet() {
-        let actionsheet = UIAlertController(title: "Select Payment Method", message: nil, preferredStyle: .actionSheet)
+        let color1 = hexStringToUIColor(hex: "#000000")
         
-        //let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        //actionsheet.addAction(cancelAction)
+        //self.window!.tintColor = UIColor.blue
+        //actionsheet.view.tintColor = UIColor.red
         
+        let titleFont = [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 18)]
+        let titleAttrString = NSMutableAttributedString(string: "Select Payment Method", attributes: titleFont)
+        let actionsheet = UIAlertController(title: nil, message: nil,  preferredStyle: .actionSheet)
+        actionsheet.setValue(titleAttrString, forKey:"attributedTitle")
+        
+        //let actionsheet = UIAlertController(title: "Select Payment Method", message: nil, preferredStyle: .actionSheet)
+
         actionsheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         let action1 = UIAlertAction(title: "Paypal", style: .default, handler: { action1 in print("tapped Dismiss")
@@ -84,7 +91,10 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
         action1.setValue(image1?.withRenderingMode(.alwaysOriginal), forKey: "image")
         actionsheet.addAction(action1)
         
+        action1.setValue(color1, forKey: "titleTextColor")
+        
         let action2 = UIAlertAction(title: "Credit or Debit Card", style: .default, handler: { action2 in //print("tapped Dismiss")
+            
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let paymentVC = storyboard.instantiateViewController(withIdentifier: "PaymentViewController2") as! PaymentViewController2
             paymentVC.receivedString = self.totalPrice.text!
@@ -94,11 +104,15 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
         action2.setValue(image2?.withRenderingMode(.alwaysOriginal), forKey: "image")
         actionsheet.addAction(action2)
         
+        action2.setValue(color1, forKey: "titleTextColor")
+        
         let action3 = UIAlertAction(title: "Apple Pay", style: .default, handler: { action3 in print("tapped Dismiss")
         })
         let image3 = UIImage(named: "Image 19.png")
         action3.setValue(image3?.withRenderingMode(.alwaysOriginal), forKey: "image")
         actionsheet.addAction(action3)
+        
+        action3.setValue(color1, forKey: "titleTextColor")
      
         actionsheet.view.backgroundColor = .white
         
@@ -106,6 +120,29 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
         actionsheet.view.clipsToBounds = true
         
         present(actionsheet, animated: true, completion: nil)
+    }
+    
+    //Color Func
+    func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+
+        var rgbValue:UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
+
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -148,7 +185,7 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.reloadData()
             self.displaySubTotal()
-            self.displayTotal()
+            //self.displayTotal()
         }
     }
     
@@ -159,7 +196,7 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
             //cartTableView.reloadData()
             self.getCartData()
             self.displaySubTotal()
-            self.displayTotal()
+            //self.displayTotal()
         }
     }
     
@@ -169,7 +206,7 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.updateCartItems(data: cartArray[sender.tag], index: sender.tag)
             cartTableView.reloadData()
             self.displaySubTotal()
-            self.displayTotal()
+            //self.displayTotal()
         }
     }
     
@@ -188,6 +225,8 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
+    //var total_price: Float = 0.0
+    
     func displaySubTotal() {
         
         var total_price: Float = 0.0
@@ -196,7 +235,14 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
                   total_price += Float(items.cartQuantity) * price
               }
           }
-          subtotalPrice.text = "\(total_price)"
+          subtotalPrice.text = "$\(total_price)"
+        
+        let pricing1 = Double(total_price)
+        //let pricing2 = Double(shippingPrice.text!)
+        let pricing = Double(pricing1 + 4.99)
+        
+        totalPrice.text = "$\(pricing)"
+        //shippingPrice.text = "$\(4.99)"
         
         /*if cartArray.count == 1 {
             let p1 = Double(cartArray[0].cartItems.price)

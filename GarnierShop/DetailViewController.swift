@@ -6,6 +6,59 @@
 //
 
 import UIKit
+import DropDown
+import Alamofire
+import OAuthSwift
+import SwiftyJSON
+
+struct variationtruct1: Codable {
+    let price: String
+    let attributes: [Attributes]
+    
+    enum CodingKeys: String, CodingKey {
+        case price
+        case attributes
+    }
+}
+
+struct Attributes: Codable {
+    let option: String
+}
+
+struct variationtruct2: Codable {
+    let price: String
+    let attributes: [Attributes]
+    
+    enum CodingKeys: String, CodingKey {
+        case price
+        case attributes
+    }
+}
+
+struct variationtruct3: Codable {
+    let price: String
+    let attributes: [Attributes]
+    
+    enum CodingKeys: String, CodingKey {
+        case price
+        case attributes
+    }
+}
+
+/*struct DropStruct : Codable {
+    var dropItems: jsonstruct
+    let attributes: [Atts]
+    
+    enum CodingKeys: String, CodingKey {
+        case dropItems
+        case attributes
+    }
+}
+
+struct Atts: Codable {
+    let name: String
+    let options: [String]
+}*/
 
 struct CartStruct : Codable {
     var cartItems: jsonstruct
@@ -17,6 +70,20 @@ class DetailViewController: UIViewController {
     var arrdata = [jsonstruct]()
     var categorydata = [Categories]()
     var imgdata = [Images]()
+    
+    var jsondata = [json]()
+    
+    var attdata = [Atts]()
+    
+    //var optiondata = [Atts]().first?.options
+    //var optiondata: [String] = []
+    
+    //var dropData = [DropStruct]()
+    
+    var variationData1: variationtruct1?
+    var variationData2: variationtruct2?
+    var variationData3: variationtruct3?
+    var attributesData = [Attributes]()
     
     var detailInfo: jsonstruct?
     var cartArray = [CartStruct]()
@@ -42,6 +109,9 @@ class DetailViewController: UIViewController {
     
     @IBOutlet var imageCollectionView: UICollectionView!
     
+    @IBOutlet var viewStorage: UIView!
+    @IBOutlet var lblStorage: UILabel!
+    
     
     var Image = UIImage()
     var Name = ""
@@ -52,6 +122,9 @@ class DetailViewController: UIViewController {
     var Img1 = UIImage()
     var Img2 = UIImage()
     var Img3 = UIImage()
+    
+    let dropDown1 = DropDown()
+    let storageArray = ["6GB RAM/128GB", "8GB RAM/128GB", "12GB RAM/256GB"]
     
     /*var callback : ((Int)->())?
     var counter1 = 0 {
@@ -71,6 +144,34 @@ class DetailViewController: UIViewController {
         else {
             cartCount.text = value
         }
+        
+        lblStorage.text = "6GB RAM/128GB"
+        dropDown1.anchorView = viewStorage
+        dropDown1.dataSource = storageArray
+        dropDown1.bottomOffset = CGPoint(x: 0, y: (dropDown1.anchorView?.plainView.bounds.height)!)
+        dropDown1.topOffset = CGPoint(x: 0, y:-(dropDown1.anchorView?.plainView.bounds.height)!)
+        dropDown1.direction = .bottom
+        dropDown1.selectionAction = { [unowned self] (index1: Int, item1: String) in
+            print("Selected Month: \(item1) at index: \(index1)")
+            self.lblStorage.text = storageArray[index1]
+            
+            if item1 == storageArray[0] {
+                prodPrice.text = "$22999.00"
+            }
+            
+            if item1 == storageArray[1] {
+                prodPrice.text = "$24999.00"
+            }
+            
+            if item1 == storageArray[2] {
+                prodPrice.text = "$27999.00"
+            }
+        }
+        
+        
+        viewStorage.backgroundColor = .systemGray6
+        viewStorage.layer.cornerRadius = 10
+        viewStorage.clipsToBounds = true
 
         probImage.layer.cornerRadius = 15
         probImage.clipsToBounds = true
@@ -108,7 +209,92 @@ class DetailViewController: UIViewController {
         self.updateUI()
         
         getdata()
+        getdata270()
+        getdata271()
+        getdata272()
+        //getdataOptions()
     }
+    
+    /*func getdataOptions() {
+        let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/products?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
+        URLSession.shared.dataTask(with: url!) { (data, response, error) in
+            do{if error == nil{
+                self.attdata = try JSONDecoder().decode([Atts].self, from: data!)
+                self.attdata.first?.options.forEach { print($0) }
+                //print(self.attdata)
+                    //DispatchQueue.main.async {
+                         //self.tableView.reloadData()
+                    //}
+                }
+            
+            }catch{
+                print("Error in get json data")
+            }
+            
+        }.resume()
+    }*/
+    
+    func getdata270() {
+        let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/products/270?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
+        URLSession.shared.dataTask(with: url!) { (data, response, error) in
+            do{if error == nil{
+                self.variationData1 = try JSONDecoder().decode(variationtruct1?.self, from: data!)
+
+                print(self.variationData1!)
+                    //DispatchQueue.main.async {
+                         //self.tableView.reloadData()
+                    //}
+                }
+            
+            }catch{
+                print("Error in get json data")
+            }
+            
+        }.resume()
+    }
+    
+    func getdata271() {
+        let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/products/271?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
+        URLSession.shared.dataTask(with: url!) { (data, response, error) in
+            do{if error == nil{
+                self.variationData2 = try JSONDecoder().decode(variationtruct2?.self, from: data!)
+
+                print(self.variationData2!)
+                    //DispatchQueue.main.async {
+                         //self.tableView.reloadData()
+                    //}
+                }
+            
+            }catch{
+                print("Error in get json data")
+            }
+            
+        }.resume()
+    }
+    
+    func getdata272() {
+        let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/products/272?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
+        URLSession.shared.dataTask(with: url!) { (data, response, error) in
+            do{if error == nil{
+                self.variationData3 = try JSONDecoder().decode(variationtruct3?.self, from: data!)
+
+                print(self.variationData3!)
+                    //DispatchQueue.main.async {
+                         //self.tableView.reloadData()
+                    //}
+                }
+            
+            }catch{
+                print("Error in get json data")
+            }
+            
+        }.resume()
+    }
+    
+    @IBAction func StorageBtnTapped(_ sender: Any) {
+        dropDown1.show()
+    }
+    
 
     override func viewWillAppear(_ animated: Bool) {
                if let info = detailInfo {
@@ -146,7 +332,7 @@ class DetailViewController: UIViewController {
         }
     }
     
-    @IBAction func imgBtnTapped(_ sender: UIButton) {
+    /*@IBAction func imgBtnTapped(_ sender: UIButton) {
         let imgarray = detailInfo?.images
         
         for item in [imgarray] {
@@ -211,7 +397,7 @@ class DetailViewController: UIViewController {
                 }
             }
         }
-    }
+    }*/
     
     
     /*@IBAction func firstImgBtnTapped(_ sender: Any) {
@@ -408,5 +594,19 @@ extension DetailViewController: UICollectionViewDelegate, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 93, height: 79)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let image = detailInfo?.images[indexPath.row].src {
+            probImage.downloadImage(from: image)
+            
+            let cel = collectionView.cellForItem(at: indexPath) as! imageCollectionViewCell
+            cel.updateCellHighlightColor()
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        let celll = collectionView.cellForItem(at: indexPath) as! imageCollectionViewCell
+        celll.updateCellHighlightColor()
     }
 }

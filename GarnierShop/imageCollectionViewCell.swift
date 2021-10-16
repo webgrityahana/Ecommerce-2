@@ -19,7 +19,8 @@ class imageCollectionViewCell: UICollectionViewCell {
     @IBOutlet var contentCellFrame: UIView!
     @IBOutlet var cellimg: UIImageView!
     
-    /*func setup(with picture: jsonstruct) {
-        String[cellimg.image] = picture.images
-    }*/
+    func updateCellHighlightColor() {
+        contentCellFrame.backgroundColor = (isSelected ? .systemGray5 : .white)
+        //backgroundColor = (isSelected ? .red : .white)
+    }
 }

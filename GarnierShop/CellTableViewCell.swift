@@ -56,6 +56,9 @@ class CellTableViewCell: UITableViewCell, UINavigationControllerDelegate {
         
         //CellTableViewCell().backgroundColor = .red
         //CellTableViewCell().layoutMargins = UIEdgeInsets(top: 50, left: 0, bottom: 50, right: 0)
+        
+        //let color1 = hexStringToUIColor(hex: "#2C2C2E")
+        //headingLbl.textColor = color1
     }
     
     @IBAction func buyBtnTapped(_ sender: Any) {
@@ -64,7 +67,18 @@ class CellTableViewCell: UITableViewCell, UINavigationControllerDelegate {
     
     func showAction() {
         if let vc = self.next(ofType: UIViewController.self) {
-            let actionsheet = UIAlertController(title: "Select Payment Method", message: nil, preferredStyle: .actionSheet)
+            
+            let color1 = hexStringToUIColor(hex: "#000000")
+            
+            //self.window!.tintColor = UIColor.blue
+            //actionsheet.view.tintColor = UIColor.red
+            
+            let titleFont = [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 18)]
+            let titleAttrString = NSMutableAttributedString(string: "Select Payment Method", attributes: titleFont)
+            let actionsheet = UIAlertController(title: nil, message: nil,  preferredStyle: .actionSheet)
+            actionsheet.setValue(titleAttrString, forKey:"attributedTitle")
+            
+            //let actionsheet = UIAlertController(title: "Select Payment Method", message: nil, preferredStyle: .actionSheet)
 
             actionsheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             
@@ -73,6 +87,8 @@ class CellTableViewCell: UITableViewCell, UINavigationControllerDelegate {
             let image1 = UIImage(named: "Image 18.png")
             action1.setValue(image1?.withRenderingMode(.alwaysOriginal), forKey: "image")
             actionsheet.addAction(action1)
+            
+            action1.setValue(color1, forKey: "titleTextColor")
             
             let action2 = UIAlertAction(title: "Credit or Debit Card", style: .default, handler: { action2 in //print("tapped Dismiss")
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -84,11 +100,15 @@ class CellTableViewCell: UITableViewCell, UINavigationControllerDelegate {
             action2.setValue(image2?.withRenderingMode(.alwaysOriginal), forKey: "image")
             actionsheet.addAction(action2)
             
+            action2.setValue(color1, forKey: "titleTextColor")
+            
             let action3 = UIAlertAction(title: "Apple Pay", style: .default, handler: { action3 in print("tapped Dismiss")
             })
             let image3 = UIImage(named: "Image 19.png")
             action3.setValue(image3?.withRenderingMode(.alwaysOriginal), forKey: "image")
             actionsheet.addAction(action3)
+            
+            action3.setValue(color1, forKey: "titleTextColor")
          
             actionsheet.view.backgroundColor = .white
             
@@ -97,6 +117,29 @@ class CellTableViewCell: UITableViewCell, UINavigationControllerDelegate {
             
             vc.present(actionsheet, animated: true, completion: nil)
         }
+    }
+    
+    //Color Func
+    func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+
+        var rgbValue:UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
+
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
     }
     
     override func layoutSubviews() {

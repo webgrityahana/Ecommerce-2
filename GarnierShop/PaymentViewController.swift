@@ -104,5 +104,41 @@ class PaymentViewController: UIViewController {
         taxtCardNo.resignFirstResponder()
         txtcvv.resignFirstResponder()
     }
-
+    @IBAction func PayBtnTapped(_ sender: Any) {
+        let add = self.storyboard?.instantiateViewController(withIdentifier: "BillingAddressViewController") as? BillingAddressViewController
+        self.navigationController?.pushViewController(add!, animated: true)
+         
+    }
+    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
