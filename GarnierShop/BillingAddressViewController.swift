@@ -15,146 +15,140 @@ enum APIError:Error {
     case encodingProblem
 }
 
-struct APIRequest {
-    //let resourceURL: URL
-    
-
-    //let resourceString = "https://webgrity.in/IOS-Testing/wp-json/wc/v3/orders?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99"
-    let resourceURL = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/orders?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
-        
-    //self.resourceURL = resourceURL
-    
-    
-    func save (_ messageToSave:Billing, completion: @escaping(Result<Billing, APIError>) -> Void) {
-        do {
-            var urlRequest = URLRequest(url: resourceURL!)
-            urlRequest.httpMethod = "POST"
-            //urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            urlRequest.httpBody = try JSONEncoder().encode(messageToSave)
-            
-            let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, _ in
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200, let jsonData = data else {
-                    completion(.failure(.responseProblem))
-                    return
-                }
-                
-                do {
-                    let messageData = try JSONDecoder().decode(Billing.self, from: jsonData)
-                    completion(.success(messageData))
-                } catch {
-                    completion(.failure(.decodingProblem))
-                }
-            }
-            dataTask.resume()
-        } catch {
-            completion(.failure(.encodingProblem))
-        }
-    }
-}
-
+// MARK: - JsonstructElement
 struct orderStruct: Codable {
-    let billing: Billing
-    let shipping: Shipping
+    
+    let paymentMethod: String
+    let paymentMethodTitle: String
+    let setPaid: Bool
+    let billing: Ing
+    let shipping: Ing
+    let lineItems: [LineItem]
+    let shippingLines: [ShippingLine]
+    //let customerNote: String
     
     enum CodingKeys: String, CodingKey {
-        case billing
-        case shipping
+        
+        case paymentMethod = "payment_method"
+        case paymentMethodTitle = "payment_method_title"
+        case setPaid = "set_paid"
+        case billing, shipping
+        case lineItems = "line_items"
+        case shippingLines = "shipping_lines"
     }
 }
 
-struct Billing: Codable {
-    let txtFName: String
-    let txtLName: String
-    let txtCompany: String
-    let txtStreet1: String
-    let txtStreet2: String
-    let txtTown: String
-    let txtPin: String
-    let txtPhone: String
-    let txtEmail: String
-    let lblState: String
-    let lblCountry: String
+// MARK: - Ing
+struct Ing: Codable {
+    let firstName, lastName, company, address1: String
+    let address2, city, state, postcode: String
+    let country: String
+    let email: String?
+    let phone: String
     
-    enum  CodingKeys: String, CodingKey {
-        case txtFName = "first_name"
-        case txtLName = "last_name"
-        case txtCompany = "company"
-        case txtStreet1 = "address_1"
-        case txtStreet2 = "address_2"
-        case txtTown = "city"
-        case txtPin = "postcode"
-        case txtPhone = "phone"
-        case txtEmail = "email"
-        case lblState = "state"
-        case lblCountry = "country"
-    }
-    
-    init(txtFName: String, txtLName: String, txtCompany: String, txtStreet1: String, txtStreet2: String, txtTown: String, txtPin: String, txtPhone: String, txtEmail: String, lblState: String, lblCountry: String){
-        self.txtFName = txtFName
-        self.txtLName = txtLName
-        self.txtCompany = txtCompany
-        self.txtStreet1 = txtStreet1
-        self.txtStreet2 = txtStreet2
-        self.txtTown = txtTown
-        self.txtPin = txtPin
-        self.txtPhone = txtPhone
-        self.txtEmail = txtEmail
-        self.lblState = lblState
-        self.lblCountry = lblCountry
-    }
-    
-    /*func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(txtFName, forKey: .txtFName)
-        try container.encode(txtLName, forKey: .txtLName)
-        try container.encode(txtCompany, forKey: .txtCompany)
-        try container.encode(txtStreet1, forKey: .txtStreet1)
-        try container.encode(txtStreet2, forKey: .txtStreet2)
-        try container.encode(txtTown, forKey: .txtTown)
-        try container.encode(txtPin, forKey: .txtPin)
-        try container.encode(txtPhone, forKey: .txtPhone)
-        try container.encode(txtEmail, forKey: .txtEmail)
-        try container.encode(lblState, forKey: .lblState)
-        try container.encode(lblCountry, forKey: .lblCountry)
-    }*/
-}
-
-struct Shipping: Codable {
-    let txtFName: String
-    let txtLName: String
-    let txtCompany: String
-    let txtStreet1: String
-    let txtStreet2: String
-    let txtTown: String
-    let txtPin: String
-    let txtPhone: String
-    let lblState: String
-    let lblCountry: String
-    
-    enum  CodingKeys: String, CodingKey {
-        case txtFName = "first_name"
-        case txtLName = "last_name"
-        case txtCompany = "company"
-        case txtStreet1 = "address_1"
-        case txtStreet2 = "address_2"
-        case txtTown = "city"
-        case txtPin = "postcode"
-        case txtPhone = "phone"
-        case lblState = "state"
-        case lblCountry = "country"
+    enum CodingKeys: String, CodingKey {
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case company
+        case address1 = "address_1"
+        case address2 = "address_2"
+        case city, state, postcode, country, email, phone
     }
 }
 
+enum CreatedVia: String, Codable {
+    case checkout = "checkout"
+    case restAPI = "rest-api"
+}
 
-class BillingAddressViewController: UIViewController {
+enum Currency: String, Codable {
+    case inr = "INR"
+}
+
+enum CurrencySymbol: String, Codable {
+    case empty = "₹"
+}
+
+// MARK: - LineItem
+struct LineItem: Codable {
+    
+    let productID: Int
+    let quantity: Int
+    //let variationID: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case productID = "product_id"
+        //case variationID = "variation_id"
+        case quantity
+    }
+}
+
+enum PaymentMethod: String, Codable {
+    case cod = "cod"
+    case empty = ""
+}
+
+enum PaymentMethodTitle: String, Codable {
+    case cashOnDelivery = "Cash on delivery"
+    case empty = ""
+}
+
+// MARK: - ShippingLine
+struct ShippingLine: Codable {
+    
+    let methodTitle: String
+    let methodID: String
+    let total: String
+    
+    enum CodingKeys: String, CodingKey {
+        case methodTitle = "method_title"
+        case methodID = "method_id"
+        case total
+    }
+}
+
+struct APIRequest {
+
+    let resourceURL = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/orders?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")
+
+    func save (_ messageToSave:orderStruct, completion: @escaping(Result<orderStruct, APIError>) -> Void) {
+        
+        var urlRequest = URLRequest(url: resourceURL!)
+        urlRequest.httpMethod = "POST"
+        //urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            let jsonData = try JSONEncoder().encode(messageToSave)
+            urlRequest.httpBody = jsonData
+        }catch let jsonErr{
+            print(jsonErr)
+        }
+
+        let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, _ in
+                   if let jsonData = data {
+                       do {
+                           let messageData = try JSONDecoder().decode(orderStruct.self, from: jsonData)
+                           completion(.success(messageData))
+                       } catch {
+                           completion(.failure(.decodingProblem))
+                       }
+                   }
+               }
+        dataTask.resume()        
+    }
+}
+
+
+class BillingAddressViewController: UIViewController, UITextFieldDelegate {
     
     var orderArray = [orderStruct]()
-    /*var billingArray = Billing(txtFName: "Ahana", txtLName: "Chakraborty", txtCompany: "X", txtStreet1: "asd", txtStreet2: "frnfvv", txtTown: "Utp", txtPin: "712245", txtPhone: "23423234432", txtEmail: "a@gmail.com", lblState: "WB", lblCountry: "Ind")*/
-    var billingArray: Billing?
-    var shippingArray: Shipping?
-    
     var updatedOrderArray = [OrderUpdate]()
+    var cartArray = [CartStruct]()
     
+    var receivingString = ""
+    var receivedName = ""
     
     @IBOutlet var viewCountry: UIView!
     @IBOutlet var lblCountry: UILabel!
@@ -172,8 +166,9 @@ class BillingAddressViewController: UIViewController {
     @IBOutlet var txtPhone: UITextField!
     @IBOutlet var txtEmail: UITextField!
     
-    @IBOutlet var placeBtn: UIButton!
+    @IBOutlet var lblEmail: UILabel!
     
+    @IBOutlet var placeBtn: UIButton!
     
     let dropDownC = DropDown()
     let countryArray = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Côte d'Ivoire", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini (fmr. Swaziland)", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Holy See", "Honduras", "Hungary", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (formerly Burma)", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"]
@@ -181,7 +176,7 @@ class BillingAddressViewController: UIViewController {
     let dropDownS = DropDown()
     let stateArray = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttarakhand", "Uttar Pradesh", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli", "Daman and Diu", "Delhi", "Lakshadweep", "Puducherry"]
     
-    var f_name = ""
+    /*var f_name = ""
     var l_name = ""
     var company = ""
     var st1 = ""
@@ -191,13 +186,21 @@ class BillingAddressViewController: UIViewController {
     var state = ""
     var country = ""
     var ph = ""
-    var mail = ""
+    var mail = ""*/
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //txtFName.text = f_name
+        txtFName.delegate = self
+        txtLName.delegate = self
+        txtCompany.delegate = self
+        txtStreet1.delegate = self
+        txtStreet2.delegate = self
+        txtTown.delegate = self
+        txtPin.delegate = self
+        txtPhone.delegate = self
+        txtEmail.delegate = self
 
         dropDownC.anchorView = viewCountry
         dropDownC.dataSource = countryArray
@@ -230,100 +233,8 @@ class BillingAddressViewController: UIViewController {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tap)
-        
-        let message = Billing(txtFName: f_name, txtLName: l_name, txtCompany: company, txtStreet1: st1, txtStreet2: st2, txtTown: town, txtPin: pincode, txtPhone: ph, txtEmail: mail, lblState: state, lblCountry: country)
-        let postRequest = APIRequest()
-        postRequest.save(message, completion: { result in
-            switch result {
-            case .success(let message):
-                print("Sent msg: \(message.txtFName)")
-            case .failure(let error):
-                print("Error occured \(error)")
-            }
-        })
     }
     
-    /*func getOrder() {
-     
-        /*let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/orders?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99/post")
-        URLSession.shared.dataTask(with: url!) { (data, response, error) in
-            do{if error == nil{
-                let data = try JSONEncoder().encode(self.orderArray)
-                print(String(data: data, encoding: .utf8)!)
-
-                    print(self.orderArray)
-                    //DispatchQueue.main.async {
-                         //self.tableView.reloadData()
-                    //}
-                }
-            }catch{
-                print("Error in get json data json")
-            }
-        }.resume()*/
-        
-        
-        /*guard let uploadData = try? JSONEncoder().encode([orderStruct]) else {
-            return
-        }*/
-        
-        let url = URL(string: "https://webgrity.in/IOS-Testing/wp-json/wc/v3/orders?consumer_key=ck_542029bdf259fa5f5a26a27242d8fa8324f13d18&consumer_secret=cs_a4196e9ef5d0c5a8fa7015cdca7b95b4942c5c99")!
-        
-        AF.request(url, method:.post, encoding: URLEncoding.httpBody, headers: nil).responseJSON { response in [orderStruct].self
-            
-            /*let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-                
-                guard data != nil else { return }
-                
-                do {
-                    let postsData = try JSONEncoder().encode([self.orderArray].self)
-                    
-                    //completionHandler(postsData)
-                }
-                catch {
-                    let error = error
-                    print(error.localizedDescription)
-                }
-                
-            }.resume()*/
-
-              //if let JSON = response.value {
-                  //let dict: [String: Any] = JSON as! [String: Any]
-
-                  //if dict["success"] as! Int == 1{
-                     //print("successValue:",dict)
-                  //}
-                  //else{
-                     //print("ErrorValue:",dict)
-                 //}
-                
-
-              //}
-              
-          }
-        
-        /*var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let task = URLSession.shared.uploadTask(with: request, from: uploadData) { data, response, error in
-            if let error = error {
-                print ("error: \(error)")
-                return
-            }
-            guard let response = response as? HTTPURLResponse,
-                (200...299).contains(response.statusCode) else {
-                print ("server error")
-                return
-            }
-            if let mimeType = response.mimeType,
-                mimeType == "application/json",
-                let data = data,
-                let dataString = String(data: data, encoding: .utf8) {
-                print ("got data: \(dataString)")
-            }
-        }
-        task.resume()*/
-    }*/
-
     @IBAction func countryBtnTapped(_ sender: Any) {
         dropDownC.show()
     }
@@ -344,11 +255,57 @@ class BillingAddressViewController: UIViewController {
         txtEmail.resignFirstResponder()
     }
     
-    @IBAction func placeBtnTapped(_ sender: Any) {
-        //getOrder()
-        
-        let done = self.storyboard?.instantiateViewController(withIdentifier: "SuccessViewController") as? SuccessViewController
-        self.navigationController?.pushViewController(done!, animated: true)
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print("Return Tapped")
+        txtFName.resignFirstResponder()
+        txtLName.resignFirstResponder()
+        txtCompany.resignFirstResponder()
+        txtStreet1.resignFirstResponder()
+        txtStreet2.resignFirstResponder()
+        txtTown.resignFirstResponder()
+        txtPin.resignFirstResponder()
+        txtPhone.resignFirstResponder()
+        txtEmail.resignFirstResponder()
+        return true
     }
     
+    @IBAction func placeBtnTapped(_ sender: Any) {
+        
+        for items in cartArray {
+            let info = items.cartItems
+            
+            let lineitems = LineItem(productID: info.id, quantity: 1)
+            let billingInfo = Ing(firstName: txtFName.text ?? "NA", lastName: txtLName.text ?? "NA", company: txtCompany.text ?? "NA", address1: txtStreet1.text ?? "NA", address2: txtStreet2.text ?? "NA", city: txtTown.text ?? "NA", state: self.lblState.text ?? "NA", postcode: txtPin.text ?? "NA", country:  self.lblCountry.text ?? "NA", email: txtEmail.text ?? "NA", phone: txtPhone.text ?? "NA")
+            
+            let shipline = ShippingLine(methodTitle: "flat_rate", methodID: "Flat Rate", total: info.price)
+            
+            let orderDetails = orderStruct(paymentMethod: PaymentMethod.cod.rawValue, paymentMethodTitle: PaymentMethodTitle.cashOnDelivery.rawValue, setPaid: true, billing: billingInfo, shipping: billingInfo, lineItems: [lineitems], shippingLines: [shipline])
+            
+            let postRequest = APIRequest()
+            postRequest.save(orderDetails, completion: { result in
+                switch result {
+                case .success(let message):
+                    print("Sent msg: \(message)")
+                    self.navigateToSuccessScreen() //If success navigate to next VC
+                    self.placeBtn.isUserInteractionEnabled = false
+                case .failure(let error):
+                    print("Error occured \(error)")
+                }
+            })
+        }
+        
+    }
+    
+    func isValidEmail(emailID:String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[]A-Za-z]{2,}"
+        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: emailID)
+    }
+    
+    func navigateToSuccessScreen() {
+        DispatchQueue.main.async {
+            let done = self.storyboard?.instantiateViewController(withIdentifier: "SuccessViewController") as? SuccessViewController
+            self.navigationController?.pushViewController(done!, animated: true)
+        }
+    }
 }

@@ -6,5 +6,6 @@ pod 'Alamofire'
 pod 'OAuthSwift'
 pod 'SwiftyJSON'
 pod 'DropDown'
+pod 'IQKeyboardManagerSwift'
 
 end

@@ -312,7 +312,7 @@ class DetailViewController: UIViewController {
             prodName.text = detailInfo.name
             probName2.text = detailInfo.name
             prodSHDesc.text = detailInfo.categories.first!.type
-            prodDesc.text = detailInfo.description
+            prodDesc.text = detailInfo.description.html2String
             prodPrice.text = "$\(detailInfo.price)"
             
             /*let imagesArray = detailInfo.images

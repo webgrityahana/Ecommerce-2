@@ -59,4 +59,13 @@ class CartCellTableViewCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
+    
+    func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+
+        // Get a reference to the second view controller
+        let secondViewController = segue.destination as! BillingAddressViewController
+
+        // Set a variable in the second view controller with the String to pass
+        secondViewController.receivedName = productNameCart.text!
+    }
 }

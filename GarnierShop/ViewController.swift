@@ -11,6 +11,7 @@ import OAuthSwift
 import SwiftyJSON
 
 struct jsonstruct: Codable {
+    let id: Int
     let name: String
     let catalog_visibility: String
     let short_description: String
@@ -21,6 +22,7 @@ struct jsonstruct: Codable {
     //let attributes: [Atts]
     
     enum CodingKeys: String, CodingKey {
+        case id
         case name
         case catalog_visibility
         case short_description
@@ -268,7 +270,7 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDelegate
 
             cell?.lblName.text = filterData[indexPath.row].name
             cell?.lblSHDesc.text = filterData[indexPath.row].categories.first?.type
-            cell?.lblDesc.text = filterData[indexPath.row].short_description
+            cell?.lblDesc.text = filterData[indexPath.row].short_description.html2String
             cell?.lblPrice.text = "$\(filterData[indexPath.row].price)"
         }
         else {
@@ -276,7 +278,7 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDelegate
 
             cell?.lblName.text = arrdata[indexPath.row].name
             cell?.lblSHDesc.text = arrdata[indexPath.row].categories.first?.type
-            cell?.lblDesc.text = arrdata[indexPath.row].short_description
+            cell?.lblDesc.text = arrdata[indexPath.row].short_description.html2String
             cell?.lblPrice.text = "$\(arrdata[indexPath.row].price)"
         }
 
@@ -333,5 +335,26 @@ extension UIImageView {
     }
 }
 
+
+extension Data {
+    var html2AttributedString: NSAttributedString? {
+        do {
+            return try NSAttributedString(data: self, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil)
+        } catch {
+            print("error:", error)
+            return  nil
+        }
+    }
+    var html2String: String { html2AttributedString?.string ?? "" }
+}
+
+extension StringProtocol {
+    var html2AttributedString: NSAttributedString? {
+        Data(utf8).html2AttributedString
+    }
+    var html2String: String {
+        html2AttributedString?.string ?? ""
+    }
+}
 
 

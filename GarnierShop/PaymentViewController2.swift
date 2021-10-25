@@ -8,7 +8,7 @@
 import UIKit
 import DropDown
 
-class PaymentViewController2: UIViewController {
+class PaymentViewController2: UIViewController, UITextFieldDelegate {
     
     @IBOutlet var firstView: UIView!
     
@@ -35,6 +35,8 @@ class PaymentViewController2: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        txtName.delegate = self
         
         amountToBePaid.text = "\(receivedString)"
         payBtn.setTitle("Pay \(receivedString)", for: .normal)
@@ -60,8 +62,7 @@ class PaymentViewController2: UIViewController {
             print("Selected Year: \(item2) at index: \(index2)")
             self.lblYear.text = yearArray[index2]
         }
-        
-        
+                
         firstView.layer.cornerRadius = 10
         firstView.clipsToBounds = true
         
@@ -110,5 +111,9 @@ class PaymentViewController2: UIViewController {
         self.navigationController?.pushViewController(add!, animated: true)
     }
     
-
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print("Return Tapped")
+        txtName.resignFirstResponder()
+        return true
+    }
 }

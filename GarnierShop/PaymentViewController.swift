@@ -8,7 +8,7 @@
 import UIKit
 import DropDown
 
-class PaymentViewController: UIViewController {
+class PaymentViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet var firstView: UIView!
     
@@ -24,7 +24,7 @@ class PaymentViewController: UIViewController {
     @IBOutlet var taxtCardNo: UITextField!
     @IBOutlet var txtcvv: UITextField!
     @IBOutlet var amountToBePaid: UILabel!
-    
+
     var receivedString = ""
     
     let dropDown1 = DropDown()
@@ -35,6 +35,8 @@ class PaymentViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        txtName.delegate = self
         
         amountToBePaid.text = receivedString
         payBtn.setTitle("Pay \(receivedString)", for: .normal)
@@ -90,7 +92,7 @@ class PaymentViewController: UIViewController {
         //txtcvv.layer.borderWidth = 1
         //txtcvv.layer.borderColor = UIColor.lightGray.cgColor
     }
-    
+
     @IBAction func showMonthsBtn(_ sender: Any) {
         dropDown1.show()
     }
@@ -108,6 +110,12 @@ class PaymentViewController: UIViewController {
         let add = self.storyboard?.instantiateViewController(withIdentifier: "BillingAddressViewController") as? BillingAddressViewController
         self.navigationController?.pushViewController(add!, animated: true)
          
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print("Return Tapped")
+        txtName.resignFirstResponder()
+        return true
     }
     
 }

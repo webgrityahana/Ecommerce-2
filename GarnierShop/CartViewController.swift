@@ -160,6 +160,7 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
         cell.cartImageView.downloadImage(from: cartArray[indexPath.row].cartItems.images.first?.src ?? "place_holder_image")
 
         cell.productNameCart.text = cartArray[indexPath.row].cartItems.name
+        
         cell.prodductDescCart.text = cartArray[indexPath.row].cartItems.categories.first?.type
         cell.productPriceCart.text = "$\(cartArray[indexPath.row].cartItems.price)"
         
@@ -173,13 +174,19 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
             cell.subBtn.isUserInteractionEnabled = true;
             cell.subBtn.addTarget(self, action: #selector(sub(sender:)), for: .touchUpInside)
             cell.subBtn.tag = indexPath.row
-        } else {
-            cell.subBtn.isUserInteractionEnabled = false;
         }
+        
+        if cartQuantity == 0 {
+            cartArray = DetailViewController().updateCartItems(name: cartArray[indexPath.row].cartItems.name)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.reloadData()
+            self.displaySubTotal()
+        }
+        
         return cell
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    /*func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             cartArray = DetailViewController().updateCartItems(name: cartArray[indexPath.row].cartItems.name)
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -187,10 +194,10 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.displaySubTotal()
             //self.displayTotal()
         }
-    }
+    }*/
     
     @objc func add(sender: UIButton){
-        if cartArray[sender.tag].cartQuantity >= 0 {
+        if cartArray[sender.tag].cartQuantity >= 1 {
             cartArray[sender.tag].cartQuantity += 1
             self.updateCartItems(data: cartArray[sender.tag], index: sender.tag)
             //cartTableView.reloadData()
@@ -242,6 +249,7 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let pricing = Double(pricing1 + 4.99)
         
         totalPrice.text = "$\(pricing)"
+
         //shippingPrice.text = "$\(4.99)"
         
         /*if cartArray.count == 1 {
@@ -333,6 +341,16 @@ class CartViewController: UIViewController, UITableViewDataSource, UITableViewDe
             subtotalPrice.text = "\(x5)"
         }*/
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+
+        // Get a reference to the second view controller
+        let secondViewController = segue.destination as! BillingAddressViewController
+
+        // Set a variable in the second view controller with the String to pass
+        secondViewController.receivingString = totalPrice.text!
+    }
+    
 }
 
 

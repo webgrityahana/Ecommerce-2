@@ -8,7 +8,7 @@
 import UIKit
 
 struct OrderUpdate: Codable {
-    let order_key: String
+    let number: String
 }
 
 class SuccessViewController: UIViewController {
@@ -16,18 +16,11 @@ class SuccessViewController: UIViewController {
     var updatedOrderArray = [OrderUpdate]()
     
     @IBOutlet var lblOrderKey: UILabel!
-    
-    //var order_id = ""
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         getOrderUpdate()
-        
-        //order_id = updatedOrderArray.first!.order_key
-        //lblOrderKey.text = order_id
-        
-        //lblOrderKey.text = updatedOrderArray.first?.order_key
     }
 
     
@@ -39,7 +32,7 @@ class SuccessViewController: UIViewController {
 
                     print(self.updatedOrderArray)
                     DispatchQueue.main.async {
-                        self.lblOrderKey.text = self.updatedOrderArray[0].order_key
+                        self.lblOrderKey.text = self.updatedOrderArray[0].number
                     }
                 
                 }
